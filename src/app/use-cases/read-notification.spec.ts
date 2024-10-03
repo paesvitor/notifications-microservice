@@ -1,5 +1,4 @@
 import { InMemoryNotificationsRepository } from '../../../test/repositories/in-memory-notifications-repository';
-import { CancelNotification } from './cancel-notification';
 import { NotificationNotFound } from './errors/notification-not-found';
 import { makeNotification } from '../../../test/factories/notification-factory';
 import { ReadNotification } from './read-notification';
@@ -21,10 +20,10 @@ describe('Read Notification', () => {
 
   it('Should not be able to not read a unexisting notification.', () => {
     const notificationsRepository = new InMemoryNotificationsRepository();
-    const cancelNotification = new CancelNotification(notificationsRepository);
+    const readNotification = new ReadNotification(notificationsRepository);
 
     expect(() => {
-      return cancelNotification.execute({
+      return readNotification.execute({
         notificationId: 'fake-id',
       });
     }).rejects.toThrow(NotificationNotFound);
