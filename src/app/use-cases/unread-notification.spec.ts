@@ -8,12 +8,14 @@ describe('Unread Notification', () => {
     const notificationsRepository = new InMemoryNotificationsRepository();
     const unreadNotification = new UnreadNotification(notificationsRepository);
 
-    const notification = makeNotification();
+    const notification = makeNotification({
+      readAt: new Date(),
+    });
 
     await notificationsRepository.create(notification);
     await unreadNotification.execute({ notificationId: notification.id });
 
-    expect(notificationsRepository.notifications[0].readAt).toEqual(null);
+    expect(notificationsRepository.notifications[0].readAt).toBeNull();
   });
 
   it('Should not be able to unread a unexisting notification.', () => {
