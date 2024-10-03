@@ -1,18 +1,14 @@
 import { InMemoryNotificationsRepository } from '../../../test/repositories/in-memory-notifications-repository';
 import { CancelNotification } from './cancel-notification';
-import { Content } from '../entities/content';
-import { Notification } from '../entities/notification';
+import { NotificationNotFound } from './errors/notification-not-found';
+import { makeNotification } from '../../../test/factories/notification-factory';
 
 describe('Cancel Notification', () => {
   it('Should be able to cancel a notification', async () => {
     const notificationsRepository = new InMemoryNotificationsRepository();
     const cancelNotification = new CancelNotification(notificationsRepository);
 
-    const notification = new Notification({
-      category: 'Social',
-      content: new Content('Nova solicitação de amizade.'),
-      recipientId: 'test-id',
-    });
+    const notification = makeNotification();
 
     await notificationsRepository.create(notification);
     await cancelNotification.execute({ notificationId: notification.id });
@@ -20,5 +16,16 @@ describe('Cancel Notification', () => {
     expect(notificationsRepository.notifications[0].canceledAt).toEqual(
       expect.any(Date),
     );
+  });
+
+  it('Should not be able to cancel a unexisting notification.', () => {
+    const notificationsRepository = new InMemoryNotificationsRepository();
+    const cancelNotification = new CancelNotification(notificationsRepository);
+
+    expect(() => {
+      return cancelNotification.execute({
+        notificationId: 'fake-id',
+      });
+    }).rejects.toThrow(NotificationNotFound);
   });
 });
